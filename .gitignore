@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+ABETProcessor/x64/Debug/qmake/temp/
+
+ABETProcessor/x64/Debug/qmake/qtvars_x64_Debug.props
+
+ABETProcessor/x64/Debug/
+
+ABETProcessor/x64/Release/qmake/temp/
+
+ABETProcessor/x64/Release/
