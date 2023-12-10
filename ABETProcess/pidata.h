@@ -20,6 +20,7 @@ public:
     QStringList CourseList;
     QMap<QString,PI> PIList;
     bool ReadFromExcel(QString filename);
+    QStringList GetPIsForCourse(const QString &coursename);
 };
 
 #endif // PIDATA_H

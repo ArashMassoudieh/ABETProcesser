@@ -82,3 +82,14 @@ bool PIData::ReadFromExcel(QString filename)
     }
     return true;
 }
+
+QStringList PIData::GetPIsForCourse(const QString &coursename)
+{
+    QStringList out;
+    for (QMap<QString,PI>::iterator it = PIList.begin(); it!=PIList.end(); it++)
+    {
+        if (it->CoursesApplied.contains(coursename))
+            out.append(it.key());
+    }
+    return out;
+}
