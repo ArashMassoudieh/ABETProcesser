@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "FilePushButton.h"
 #include "pidata.h"
+#include "studentcoursedata.h"
 
 namespace Ui {
 class formCreateSpreadSheets;
@@ -17,6 +18,7 @@ public:
     explicit formCreateSpreadSheets(QWidget *parent = nullptr);
     ~formCreateSpreadSheets();
     PIData pi_data;
+    StudentCourseData student_course_data;
 
 private:
     Ui::formCreateSpreadSheets *ui;

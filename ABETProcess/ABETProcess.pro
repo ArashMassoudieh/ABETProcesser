@@ -17,14 +17,16 @@ SOURCES += \
     FilePushButton.cpp \
     formcreatespreadsheets.cpp \
     mainwindow.cpp \
-    pidata.cpp
+    pidata.cpp \
+    studentcoursedata.cpp
 
 HEADERS += \
     ../ABETProcessor/ABETProcessor.h \
     FilePushButton.h \
     formcreatespreadsheets.h \
     mainwindow.h \
-    pidata.h
+    pidata.h \
+    studentcoursedata.h
 
 FORMS += \
     ../ABETProcessor/ABETProcessor.ui \
