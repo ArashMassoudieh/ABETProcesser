@@ -32,4 +32,5 @@ void formCreateSpreadSheets::OnOkPressed()
     QString StudentsExcelFileName = StudentData_pb->text();
     pi_data.ReadFromExcel(PIExcelFileName);
     student_course_data.ReadFromExcel(StudentsExcelFileName);
+    pi_data.CreateExcelFiles(&student_course_data,QDir());
 }

@@ -93,3 +93,26 @@ QStringList PIData::GetPIsForCourse(const QString &coursename)
     }
     return out;
 }
+
+bool PIData::CreateExcelFiles(StudentCourseData *studentData,const QDir &OutputLocation)
+{
+    for (int i=0; i<CourseList.count(); i++)
+    {
+        CreateExcelFile(studentData,CourseList[i],"");
+    }
+    return true;
+}
+
+bool PIData::CreateExcelFile(StudentCourseData *studentData,const QString &course, const QString &OutputFile)
+{
+    StudentCourseInfo info;
+    if (course.split(" ").count()!=2)
+        return false;
+    info.Subject = course.split(" ")[0];
+    info.Catalog = course.split(" ")[1];
+    StudentCourseData extracted_data = studentData->Filter(info);
+    QMap<QString,StudentCourseData> extracted_splitted_data = extracted_data.SplitBySections();
+
+    return true;
+
+}

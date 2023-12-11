@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QList>
+#include <QMap>
 
 struct StudentCourseInfo
 {
@@ -23,6 +24,17 @@ struct StudentCourseInfo
     QString GradingBasis;
     double CumGPA = 0;
     double CurrentGPA = 0;
+    bool operator == (const StudentCourseInfo &rhs) const
+    {
+        bool out=false;
+        if (StudentID == rhs.StudentID || rhs.StudentID=="")
+            if (Subject == rhs.Subject || rhs.Subject == "")
+                if (Catalog == rhs.Catalog || rhs.Catalog == "")
+                    if (Section == rhs.Section || rhs.Section == "")
+                        out=true;
+
+        return out;
+    }
 
 };
 
@@ -33,6 +45,8 @@ public:
     StudentCourseData(const StudentCourseData &stcoursedata);
     StudentCourseData& operator=(const StudentCourseData &stcoursedata);
     bool ReadFromExcel(const QString &filename);
+    StudentCourseData Filter(const StudentCourseInfo &info);
+    QMap<QString,StudentCourseData> SplitBySections();
 };
 
 #endif // STUDENTCOURSEDATA_H

@@ -2,6 +2,8 @@
 #define PIDATA_H
 
 #include <QMap>
+#include <studentcoursedata.h>
+#include <QDir>
 
 struct PI{
     QString ID;
@@ -21,6 +23,8 @@ public:
     QMap<QString,PI> PIList;
     bool ReadFromExcel(QString filename);
     QStringList GetPIsForCourse(const QString &coursename);
+    bool CreateExcelFiles(StudentCourseData *studentData,const QDir &OutputLocation);
+    bool CreateExcelFile(StudentCourseData *studentData,const QString &course, const QString &OutputFile);
 };
 
 #endif // PIDATA_H
