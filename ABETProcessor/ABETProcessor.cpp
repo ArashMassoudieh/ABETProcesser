@@ -1,5 +1,5 @@
 #include "ABETProcessor.h"
-#include <qdir>
+#include <qdir.h>
 #include <qdiriterator.h>
 #include <qdebug.h>
 #include "xlsxdocument.h"
@@ -8,6 +8,7 @@
 #include "xlsxchart.h"
 #include "xlsxrichstring.h"
 #include "xlsxworkbook.h"
+#include "formcreatespreadsheets.h"
 
 using namespace QXlsx;
 
@@ -15,9 +16,14 @@ ABETProcessor::ABETProcessor(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+    connect(ui.actionCreate_PI_Spreadsheets,SIGNAL(triggered()),this,SLOT(OnCreatePITables()));
+    connect(ui.actionProcess_PI_SpreadSheets,SIGNAL(triggered()),this,SLOT(OnProcessPIFiles()));
+
+}
+
+void ABETProcessor::OnProcessPIFiles()
+{
     QDir dir("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/September (Fall) 2022 - May (spring) 2023 ABET Collected Course Materials");
-    
-    
     dir.setFilter(QDir::Dirs);
     QDirIterator directories(dir.absolutePath(), QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QStringList all_dirs;
@@ -30,14 +36,14 @@ ABETProcessor::ABETProcessor(QWidget *parent)
         QStringList nameFilter("*.xlsx");
         QStringList xlsFilesAndDirectories = courseDir.entryList(nameFilter);
         qDebug() << xlsFilesAndDirectories;
-        
+
         for (int i = 0; i < xlsFilesAndDirectories.count(); i++)
         {
             QString fullfilename = courseDir.absolutePath() + "/" + xlsFilesAndDirectories[i];
             qDebug() << fullfilename;
             Document xlsxR(fullfilename);
             xlsxR.saveAs("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/22-23-All/" + xlsFilesAndDirectories[i]);
-        
+
             QStringList sheetnames;
             if (xlsxR.load()) // load excel file
             {
@@ -51,7 +57,7 @@ ABETProcessor::ABETProcessor(QWidget *parent)
                 if (sheetnames[j].contains("."))
                 {
                     xlsxR.selectSheet(sheetnames[j]);
-                    int row = 19; 
+                    int row = 19;
                     while (xlsxR.cellAt(row, 1) && xlsxR.cellAt(row, 2))
                     {
                         if (!xlsxR.cellAt(row, 1)->readValue().toString().isEmpty() && !xlsxR.cellAt(row, 2)->readValue().toString().isEmpty())
@@ -71,13 +77,19 @@ ABETProcessor::ABETProcessor(QWidget *parent)
                     }
                 }
             }
-            
+
         }
-       
+
     }
     WriteToCSV("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/22-23-All/AllData.csv", data);
     QVector<course_pi_aggregate_item> aggregate_data = ExtractAggregatePI(data);
     WritePISummaryToCSV("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/22-23-All/Aggregate_data.csv", aggregate_data);
+}
+void ABETProcessor::OnCreatePITables()
+{
+    formCreateSpreadSheets *Formcrtspreadsheet = new formCreateSpreadSheets(this);
+    ui.horizontalLayout->addWidget(Formcrtspreadsheet);
+
 }
 
 bool ABETProcessor::WriteToCSV(const QString& fileaName, const QVector<data_item> &data)

@@ -37,4 +37,8 @@ public:
 
 private:
     Ui::ABETProcessorClass ui;
+
+public slots:
+    void OnProcessPIFiles();
+    void OnCreatePITables();
 };
