@@ -64,8 +64,8 @@ ABETProcessor::ABETProcessor(QWidget *parent)
                             Row.PerformanceIndicator = sheetnames[j];
                             Row.CourseName = sheetnames[0];
                             Row.Semester = xlsxR.cellAt(6, 7)->readValue().toString();
-                            
-                            data.append(Row);
+                            if (!Row.Score.trimmed().isEmpty())
+                                data.append(Row);
                         }
                         row++;
                     }
@@ -76,6 +76,8 @@ ABETProcessor::ABETProcessor(QWidget *parent)
        
     }
     WriteToCSV("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/22-23-All/AllData.csv", data);
+    QVector<course_pi_aggregate_item> aggregate_data = ExtractAggregatePI(data);
+    WritePISummaryToCSV("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/22-23-All/Aggregate_data.csv", aggregate_data);
 }
 
 bool ABETProcessor::WriteToCSV(const QString& fileaName, const QVector<data_item> &data)
@@ -92,6 +94,21 @@ bool ABETProcessor::WriteToCSV(const QString& fileaName, const QVector<data_item
     return true;
 }
 
+
+bool ABETProcessor::WritePISummaryToCSV(const QString& fileName, const QVector<course_pi_aggregate_item>& coursepiaggdata)
+{
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << "SO,CourseName,PerformanceIndicator,Percent Satisfactory\n";
+
+    for (int i = 0; i < coursepiaggdata.size(); i++)
+        out << "SO " + coursepiaggdata[i].SO << "," << coursepiaggdata[i].CourseName << "," << coursepiaggdata[i].PerformanceIndicator << "," << coursepiaggdata[i].PercentSatisfactory * 100 << "\n";
+    file.close();
+
+    return true;
+}
+
 int ABETProcessor::scoretonumber(const QString& score)
 {
     if (score == "Unsatisfactory")
@@ -103,4 +120,62 @@ int ABETProcessor::scoretonumber(const QString& score)
     else if (score == "Exemplary")
         return 4; 
     return -999; 
+}
+
+QStringList ABETProcessor::AllCourseNames(QVector<data_item> &data)
+{
+    QStringList out; 
+    for (int i = 0; i < data.size(); i++)
+    {
+        if (!out.contains(data[i].CourseName))
+            out.append(data[i].CourseName);
+    }
+    return out; 
+}
+
+QStringList ABETProcessor::PIsforCourse(QString &CourseName, QVector<data_item>& data)
+{
+    QStringList out;
+    for (int i = 0; i < data.size(); i++)
+    {
+        if (data[i].CourseName == CourseName)
+            if (!out.contains(data[i].PerformanceIndicator))
+                out.append(data[i].PerformanceIndicator);
+    }
+    return out;
+}
+
+
+
+QVector<course_pi_aggregate_item>  ABETProcessor::ExtractAggregatePI(QVector<data_item>& data)
+{
+    QVector<course_pi_aggregate_item> out; 
+    QStringList CourseNames = AllCourseNames(data);
+    for (int course_counter = 0; course_counter < CourseNames.size(); course_counter++)
+    {
+        QStringList PIs = PIsforCourse(CourseNames[course_counter],data);
+        for (int picounter = 0; picounter < PIs.count(); picounter++)
+        {
+            double counttotal = 0;
+            double countsatisfied = 0;
+            for (int data_counter = 0; data_counter < data.size(); data_counter++)
+            {
+                if (data[data_counter].CourseName == CourseNames[course_counter] && data[data_counter].PerformanceIndicator == PIs[picounter])
+                {
+                    counttotal++;
+                    if (scoretonumber(data[data_counter].Score) > 2)
+                        countsatisfied++;
+                }
+            }
+            course_pi_aggregate_item PI_item;
+            PI_item.CourseName = CourseNames[course_counter];
+            PI_item.PerformanceIndicator = PIs[picounter];
+            PI_item.SO = PIs[picounter].split(".")[0];
+            PI_item.PercentSatisfactory = countsatisfied / counttotal;
+            out.append(PI_item);
+
+        }
+
+    }
+    return out;
 }
