@@ -60,7 +60,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>F:\Projects\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\ABETProcesser\ABETProcess;F:\Projects\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>F:\Projects\QXlsx\QXlsx</AdditionalLibraryDirectories>
@@ -73,7 +73,7 @@
       <AdditionalDependencies>QXlsx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>F:\Projects\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);$(Qt_INCLUDEPATH_)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>F:\Projects\ABETProcesser\ABETProcess;F:\Projects\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);$(Qt_INCLUDEPATH_)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -104,10 +104,34 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="ABETProcessor.qrc" />
+    <QtUic Include="..\ABETProcess\formcreatespreadsheets.ui" />
+    <QtUic Include="..\ABETProcess\mainwindow.ui" />
     <QtUic Include="ABETProcessor.ui" />
     <QtMoc Include="ABETProcessor.h" />
+    <ClCompile Include="..\ABETProcess\filebrowserpushbuttom.cpp" />
+    <ClCompile Include="..\ABETProcess\FilePushButton.cpp" />
+    <ClCompile Include="..\ABETProcess\formcreatespreadsheets.cpp" />
+    <ClCompile Include="..\ABETProcess\mainwindow.cpp" />
+    <ClCompile Include="..\ABETProcess\pidata.cpp" />
+    <ClCompile Include="..\ABETProcess\studentcoursedata.cpp" />
     <ClCompile Include="ABETProcessor.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\ABETProcess\filebrowserpushbuttom.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\ABETProcess\FilePushButton.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\ABETProcess\formcreatespreadsheets.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="..\ABETProcess\mainwindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ABETProcess\pidata.h" />
+    <ClInclude Include="..\ABETProcess\studentcoursedata.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
