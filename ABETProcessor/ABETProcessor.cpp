@@ -9,6 +9,7 @@
 #include "xlsxrichstring.h"
 #include "xlsxworkbook.h"
 #include "formcreatespreadsheets.h"
+#include "formCourseEvaluations.h"
 
 using namespace QXlsx;
 
@@ -18,6 +19,7 @@ ABETProcessor::ABETProcessor(QWidget *parent)
     ui.setupUi(this);
     connect(ui.actionCreate_PI_Spreadsheets,SIGNAL(triggered()),this,SLOT(OnCreatePITables()));
     connect(ui.actionProcess_PI_SpreadSheets,SIGNAL(triggered()),this,SLOT(OnProcessPIFiles()));
+    connect(ui.actionProcess_Course_Evaluations, SIGNAL(triggered()), this, SLOT(OnCourseEvaluations()));
 
 }
 
@@ -90,6 +92,12 @@ void ABETProcessor::OnCreatePITables()
     formCreateSpreadSheets *Formcrtspreadsheet = new formCreateSpreadSheets(this);
     ui.horizontalLayout->addWidget(Formcrtspreadsheet);
 
+}
+
+void ABETProcessor::OnCourseEvaluations()
+{
+    formCourseEvaluations* FormCrsEvals = new formCourseEvaluations(this);
+    ui.horizontalLayout->addWidget(FormCrsEvals);
 }
 
 bool ABETProcessor::WriteToCSV(const QString& fileaName, const QVector<data_item> &data)

@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ABETProcessor", "ABETProcessor\ABETProcessor.vcxproj", "{A13F231E-D085-401E-8151-F35E9B1644E7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2F08A811-4659-4BF8-9C8F-BBA5C3DB8640}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

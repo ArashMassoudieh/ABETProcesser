@@ -41,4 +41,5 @@ private:
 public slots:
     void OnProcessPIFiles();
     void OnCreatePITables();
+    void OnCourseEvaluations();
 };

@@ -26,7 +26,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuCreate_PI_Spreadsheets">
@@ -35,6 +35,7 @@
     </property>
     <addaction name="actionCreate_PI_Spreadsheets"/>
     <addaction name="actionProcess_PI_SpreadSheets"/>
+    <addaction name="actionProcess_Course_Evaluations"/>
    </widget>
    <addaction name="menuCreate_PI_Spreadsheets"/>
   </widget>
@@ -55,6 +56,11 @@
   <action name="actionProcess_PI_SpreadSheets">
    <property name="text">
     <string>Process PI SpreadSheets</string>
+   </property>
+  </action>
+  <action name="actionProcess_Course_Evaluations">
+   <property name="text">
+    <string>Process Course Evaluations</string>
    </property>
   </action>
  </widget>

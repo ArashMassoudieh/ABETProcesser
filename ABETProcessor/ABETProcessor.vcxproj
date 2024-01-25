@@ -32,12 +32,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>5.12</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>5.12</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtModules>core;sql;sql;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -115,7 +115,10 @@
     <ClCompile Include="..\ABETProcess\pidata.cpp" />
     <ClCompile Include="..\ABETProcess\studentcoursedata.cpp" />
     <ClCompile Include="ABETProcessor.cpp" />
+    <ClCompile Include="CourseEvaluationData.cpp" />
+    <ClCompile Include="formCourseEvaluations.cpp" />
     <ClCompile Include="main.cpp" />
+    <QtUic Include="formCourseEvaluations.ui" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="..\ABETProcess\filebrowserpushbuttom.h" />
@@ -132,6 +135,8 @@
   <ItemGroup>
     <ClInclude Include="..\ABETProcess\pidata.h" />
     <ClInclude Include="..\ABETProcess\studentcoursedata.h" />
+    <ClInclude Include="CourseEvaluationData.h" />
+    <QtMoc Include="formCourseEvaluations.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
