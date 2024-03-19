@@ -9,22 +9,20 @@
 
 using namespace QXlsx;
 
-PIData::PIData()
+PIData::PIData():QMap<QString, PI>()
 {
 
 }
 
-PIData::PIData(const PIData &RHS)
+PIData::PIData(const PIData &RHS):QMap<QString, PI>(RHS)
 {
     CourseList = RHS.CourseList;
-    PIList = RHS.PIList;
-
 }
 PIData& PIData::operator==(const PIData &RHS)
 {
 
     CourseList = RHS.CourseList;
-    PIList = RHS.PIList;
+    QMap<QString,PI>::operator=(RHS);
     return *this;
 }
 
@@ -76,7 +74,7 @@ bool PIData::ReadFromExcel(QString filename)
                         }
                     }
                 }
-                PIList[item.ID] = item;
+                operator[](item.ID) = item;
             }
         row++;
     }
@@ -86,7 +84,7 @@ bool PIData::ReadFromExcel(QString filename)
 QStringList PIData::GetPIsForCourse(const QString &coursename)
 {
     QStringList out;
-    for (QMap<QString,PI>::iterator it = PIList.begin(); it!=PIList.end(); it++)
+    for (QMap<QString,PI>::iterator it = begin(); it!=end(); it++)
     {
         if (it->CoursesApplied.contains(coursename))
             out.append(it.key());
@@ -98,7 +96,7 @@ bool PIData::CreateExcelFiles(StudentCourseData *studentData,const QDir &OutputL
 {
     for (int i=0; i<CourseList.count(); i++)
     {
-        CreateExcelFile(studentData,CourseList[i],"");
+        CreateExcelFile(studentData,CourseList[i],OutputLocation.absolutePath() + "/" + CourseList[i] );
     }
     return true;
 }
@@ -112,7 +110,50 @@ bool PIData::CreateExcelFile(StudentCourseData *studentData,const QString &cours
     info.Catalog = course.split(" ")[1];
     StudentCourseData extracted_data = studentData->Filter(info);
     QMap<QString,StudentCourseData> extracted_splitted_data = extracted_data.SplitBySections();
-
+    for (QMap<QString, StudentCourseData>::iterator it = extracted_splitted_data.begin() ; it!= extracted_splitted_data.end(); it++)
+    {
+        CreateExcelFile(&extracted_splitted_data[it.key()],course,OutputFile+".xlsx",it.key());
+    }
     return true;
 
+}
+
+bool PIData::CreateExcelFile(StudentCourseData *studentData,const QString &course, const QString &OutputFile, const QString &section)
+{
+    QXlsx::Document xlsxW;
+    int start_row = 5;
+    QStringList PIs = GetPIsForCourse(course);
+    if (PIs.count()>0)
+    {   for (int i=0; i<PIs.count(); i++)
+        {
+
+            xlsxW.addSheet(operator[](PIs[i]).ID);
+            xlsxW.selectSheet(operator[](PIs[i]).ID);
+            xlsxW.write(2,2,operator[](PIs[i]).ID);
+            xlsxW.write(2,3,operator[](PIs[i]).Description);
+            xlsxW.write(3,2,"Please enter the scores as follows: 1: Unsartisfactory, 2: Developing, 3: Satisfactory, and 4: Exemplary");
+            QXlsx::Format bold;
+            bold.setFontBold(true);
+
+            xlsxW.write(start_row, 1, "Name",bold);
+            xlsxW.setColumnWidth(1,30);
+            xlsxW.write(start_row, 2, "Student_ID",bold);
+            xlsxW.setColumnWidth(2,30);
+            xlsxW.write(start_row, 3, "Program",bold);
+            xlsxW.setColumnWidth(3,30);
+            xlsxW.write(start_row, 4, "Score",bold);
+            xlsxW.setColumnWidth(4,30);
+            for (int j=0; j<studentData->count(); j++)
+            {
+                xlsxW.write(start_row+j+1,1, studentData->at(j).StudentName);
+                xlsxW.write(start_row+j+1,2, studentData->at(j).StudentID);
+                xlsxW.write(start_row+j+1,3, studentData->at(j).AcadPlan);
+                xlsxW.write(start_row+j+1,4, "");
+            }
+            xlsxW.deleteSheet("Sheet1");
+        }
+
+        xlsxW.saveAs(OutputFile.split(".")[0] + "_" + section + "." + OutputFile.split(".")[1]);
+    }
+    return true;
 }

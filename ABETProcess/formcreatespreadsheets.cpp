@@ -4,6 +4,7 @@
 #include "QLabel"
 #include "QtSql/QSql"
 #include "pidata.h"
+#include "QFileDialog"
 
 
 formCreateSpreadSheets::formCreateSpreadSheets(QWidget *parent) :
@@ -30,7 +31,13 @@ void formCreateSpreadSheets::OnOkPressed()
 {
     QString PIExcelFileName = PITable_pb->text();
     QString StudentsExcelFileName = StudentData_pb->text();
+    QString dirString = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                 "/home",
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+
+    QDir dir(dirString);
     pi_data.ReadFromExcel(PIExcelFileName);
     student_course_data.ReadFromExcel(StudentsExcelFileName);
-    pi_data.CreateExcelFiles(&student_course_data,QDir());
+    pi_data.CreateExcelFiles(&student_course_data,dir);
 }
