@@ -56,6 +56,25 @@ void formCourseEvaluations::OnOkPressed()
             "(id integer primary key, "
             "subject varchar(20), "
             "catalog varchar(30), "
+            "coursenumber varchar(30), "
+            "section varchar(30), "
+            "instructor varchar(30), "
+            "year_semester varchar(30), "
+            "evaluated integer, "
+            "enrolled integer, "
+            "score float)");
+
+        db.close();
+    }
+    else if (!db.tables().contains("CourseEvals"))
+    {
+        db.open();
+        QSqlQuery query;
+        query.exec("create table CourseEvals "
+            "(id integer primary key, "
+            "subject varchar(20), "
+            "catalog varchar(30), "
+            "coursenumber varchar(30), "
             "section varchar(30), "
             "instructor varchar(30), "
             "year_semester varchar(30), "

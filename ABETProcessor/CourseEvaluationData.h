@@ -8,6 +8,7 @@ struct CourseEvalItems
 {
 	QString Subject;
 	QString Catalog;
+	QString CourseNumber; 
 	QString Section;
 	QString CourseTitle; 
 	QString Instructor; 

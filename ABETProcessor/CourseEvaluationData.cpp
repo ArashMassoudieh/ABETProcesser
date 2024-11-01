@@ -59,7 +59,9 @@ bool CourseEvaluationData::ReadFromExcel(QString filename)
 
     bool x = xlsxR.selectSheet(sheetnames[0]);
     int row = 8;
-    
+    qDebug() << xlsxR.cellAt(8, 1); 
+    qDebug() << xlsxR.cellAt(8, 2);
+    qDebug() << xlsxR.cellAt(12, 3);
     while (xlsxR.cellAt(row, 1) && xlsxR.cellAt(row, 2))
     {
         if (!xlsxR.cellAt(row, 1)->readValue().toString().isEmpty() && !xlsxR.cellAt(row, 2)->readValue().toString().isEmpty())
@@ -67,6 +69,7 @@ bool CourseEvaluationData::ReadFromExcel(QString filename)
             CourseEvalItems Row;
             Row.Catalog = xlsxR.cellAt(row, 3)->readValue().toString();
             Row.CourseTitle = xlsxR.cellAt(row, 5)->readValue().toString();
+            Row.CourseNumber = xlsxR.cellAt(row, 2)->readValue().toString() + " " + xlsxR.cellAt(row, 3)->readValue().toString();
             Row.Enrolled = xlsxR.cellAt(row, 10)->readValue().toInt();
             Row.Evaluated = xlsxR.cellAt(row, 11)->readValue().toInt();
             Row.Instructor = xlsxR.cellAt(row, 9)->readValue().toString().remove(",").remove('/');
@@ -92,8 +95,8 @@ bool CourseEvaluationData::AppendtoSqlit(QSqlDatabase* db)
     bool res = true; 
     for (int i = 0; i < size(); i++)
     {
-        QString qrystatement = "INSERT INTO CourseEvals ( subject, catalog, section, instructor, year_semester, evaluated, enrolled, score ) "
-            "VALUES ('" + at(i).Subject + "','" + at(i).Catalog + "','" + at(i).Section + "','" + at(i).Instructor + "','" + at(i).Year_Semester + "'," + QString::number(at(i).Evaluated) + "," + QString::number(at(i).Enrolled) + "," + QString::number(at(i).score) + ")";
+        QString qrystatement = "INSERT INTO CourseEvals ( subject, catalog, section, coursenumber, instructor, year_semester, evaluated, enrolled, score ) "
+            "VALUES ('" + at(i).Subject + "','" + at(i).Catalog + "','" + at(i).Section + "','" + at(i).CourseNumber + "','" + at(i).Instructor + "','" + at(i).Year_Semester + "'," + QString::number(at(i).Evaluated) + "," + QString::number(at(i).Enrolled) + "," + QString::number(at(i).score) + ")";
         res &= query.prepare(qrystatement);
         if (res) query.exec(qrystatement);
         if (!res)
