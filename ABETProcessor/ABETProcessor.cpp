@@ -25,7 +25,7 @@ ABETProcessor::ABETProcessor(QWidget *parent)
 
 void ABETProcessor::OnProcessPIFiles()
 {
-    QDir dir("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/September (Fall) 2022 - May (spring) 2023 ABET Collected Course Materials");
+    QDir dir("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All");
     dir.setFilter(QDir::Dirs);
     QDirIterator directories(dir.absolutePath(), QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
     QStringList all_dirs;
@@ -44,7 +44,7 @@ void ABETProcessor::OnProcessPIFiles()
             QString fullfilename = courseDir.absolutePath() + "/" + xlsFilesAndDirectories[i];
             qDebug() << fullfilename;
             Document xlsxR(fullfilename);
-            xlsxR.saveAs("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/22-23-All/" + xlsFilesAndDirectories[i]);
+            xlsxR.saveAs("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/saved/" + xlsFilesAndDirectories[i]);
 
             QStringList sheetnames;
             if (xlsxR.load()) // load excel file
@@ -59,23 +59,43 @@ void ABETProcessor::OnProcessPIFiles()
                 if (sheetnames[j].contains("."))
                 {
                     xlsxR.selectSheet(sheetnames[j]);
-                    int row = 19;
+                    int row = 6;
                     while (xlsxR.cellAt(row, 1) && xlsxR.cellAt(row, 2))
                     {
                         if (!xlsxR.cellAt(row, 1)->readValue().toString().isEmpty() && !xlsxR.cellAt(row, 2)->readValue().toString().isEmpty())
                         {
-                            data_item Row;
-                            qDebug() << row;
-                            Row.lastname = xlsxR.cellAt(row, 1)->readValue().toString().remove(",");
-                            Row.firstname = xlsxR.cellAt(row, 2)->readValue().toString().remove(",");
-                            Row.Score = xlsxR.cellAt(row, 3)->readValue().toString().remove(",");
-                            Row.PerformanceIndicator = sheetnames[j];
-                            Row.CourseName = sheetnames[0];
-                            Row.Semester = xlsxR.cellAt(6, 7)->readValue().toString();
-                            if (!Row.Score.trimmed().isEmpty())
-                                data.append(Row);
+                            if ((xlsxR.cellAt(row, 3)->readValue().toString() == "BSARCH/BCE" || xlsxR.cellAt(row, 3)->readValue().toString() == "CE-BCE") && Program == program::ce)
+                            {
+                                data_item Row;
+                                qDebug() << row;
+                                Row.lastname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[0];
+                                Row.firstname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[1];
+                                Row.studentID = xlsxR.cellAt(row, 2)->readValue().toString();
+                                Row.program = xlsxR.cellAt(row, 3)->readValue().toString();
+                                Row.Score = xlsxR.cellAt(row, 4)->readValue().toString().remove(",");
+                                Row.PerformanceIndicator = sheetnames[j];
+                                Row.CourseName = xlsFilesAndDirectories[i].split(".")[0].split("_")[0];
+                                //Row.Semester = xlsxR.cellAt(6, 7)->readValue().toString();
+                                if (!Row.Score.trimmed().isEmpty())
+                                    data.append(Row);
+                            }
+                            else if (xlsxR.cellAt(row, 3)->readValue().toString() == "ENVEN-BS" && Program == program::environmental)
+                            {
+                                data_item Row;
+                                qDebug() << row;
+                                Row.lastname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[0];
+                                Row.firstname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[1];
+                                Row.studentID = xlsxR.cellAt(row, 2)->readValue().toString();
+                                Row.program = xlsxR.cellAt(row, 3)->readValue().toString();
+                                Row.Score = xlsxR.cellAt(row, 4)->readValue().toString().remove(",");
+                                Row.PerformanceIndicator = sheetnames[j];
+                                Row.CourseName = xlsFilesAndDirectories[i].split(".")[0].split("_")[0];
+                                //Row.Semester = xlsxR.cellAt(6, 7)->readValue().toString();
+                                if (!Row.Score.trimmed().isEmpty())
+                                    data.append(Row);
+                            }
+                            row++;
                         }
-                        row++;
                     }
                 }
             }
@@ -83,9 +103,15 @@ void ABETProcessor::OnProcessPIFiles()
         }
 
     }
-    WriteToCSV("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/22-23-All/AllData.csv", data);
+    if (Program == program::environmental)
+        WriteToCSV("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/AllData_ENV.csv", data);
+    else if (Program == program::ce)
+        WriteToCSV("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/AllData_CE.csv", data);
     QVector<course_pi_aggregate_item> aggregate_data = ExtractAggregatePI(data);
-    WritePISummaryToCSV("G:/Shared drives/ENGR-CEE-COMMON/ABET/Collected_Course_Material/22-23-All/Aggregate_data.csv", aggregate_data);
+    if (Program == program::environmental)
+        WritePISummaryToCSV("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/Aggregate_data_ENV.csv", aggregate_data);
+    else if (Program == program::ce)
+        WritePISummaryToCSV("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/Aggregate_data_CE.csv", aggregate_data);
 }
 void ABETProcessor::OnCreatePITables()
 {
@@ -105,10 +131,10 @@ bool ABETProcessor::WriteToCSV(const QString& fileaName, const QVector<data_item
     QFile file(fileaName);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
-    out << "firstname,lastname,CourseName,PerformanceIndicator,Semester,Score,ScoreValue\n";
+    out << "firstname,lastname,CourseName,PerformanceIndicator,Program,Semester,Score,ScoreValue\n";
 
     for (int i = 0; i < data.size(); i++)
-        out << data[i].firstname << "," << data[i].lastname << "," << data[i].CourseName << "," << data[i].PerformanceIndicator << "," << data[i].Semester << "," << data[i].Score << "," << scoretonumber(data[i].Score)<<"\n";
+        out << data[i].firstname << "," << data[i].lastname << "," << data[i].CourseName << "," << data[i].PerformanceIndicator << "," << data[i].program << "," << data[i].Semester << "," << data[i].Score << "," << scoretonumber(data[i].Score) << "\n";
     file.close();
 
     return true;
@@ -183,7 +209,7 @@ QVector<course_pi_aggregate_item>  ABETProcessor::ExtractAggregatePI(QVector<dat
                 if (data[data_counter].CourseName == CourseNames[course_counter] && data[data_counter].PerformanceIndicator == PIs[picounter])
                 {
                     counttotal++;
-                    if (scoretonumber(data[data_counter].Score) > 2)
+                    if (data[data_counter].Score.toDouble() > 2)
                         countsatisfied++;
                 }
             }

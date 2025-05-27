@@ -31,7 +31,7 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>5.15</QtInstall>
+    <QtInstall>6.7</QtInstall>
     <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
@@ -63,14 +63,14 @@
       <AdditionalIncludeDirectories>C:\Projects\ABETProcesser\ABETProcess;C:\Projects\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Projects\QXlsx\bin</AdditionalLibraryDirectories>
-      <AdditionalDependencies>QXlsx.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Projects\QXlsx\bin\Qt6</AdditionalLibraryDirectories>
+      <AdditionalDependencies>QXlsxQt6.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalLibraryDirectories>C:\Projects\QXlsx\bin</AdditionalLibraryDirectories>
-      <AdditionalDependencies>QXlsxd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Projects\QXlsx\bin\Qt6</AdditionalLibraryDirectories>
+      <AdditionalDependencies>QXlsxQt6d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>C:\Projects\ABETProcesser\ABETProcess;C:\Projects\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);$(Qt_INCLUDEPATH_)</AdditionalIncludeDirectories>

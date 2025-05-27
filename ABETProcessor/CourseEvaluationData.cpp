@@ -59,9 +59,9 @@ bool CourseEvaluationData::ReadFromExcel(QString filename)
 
     bool x = xlsxR.selectSheet(sheetnames[0]);
     int row = 8;
-    qDebug() << xlsxR.cellAt(8, 1); 
-    qDebug() << xlsxR.cellAt(8, 2);
-    qDebug() << xlsxR.cellAt(12, 3);
+    //qDebug() << xlsxR.cellAt(8, 1); 
+    //qDebug() << xlsxR.cellAt(8, 2);
+    //qDebug() << xlsxR.cellAt(12, 3);
     while (xlsxR.cellAt(row, 1) && xlsxR.cellAt(row, 2))
     {
         if (!xlsxR.cellAt(row, 1)->readValue().toString().isEmpty() && !xlsxR.cellAt(row, 2)->readValue().toString().isEmpty())

@@ -3,10 +3,14 @@
 #include <QtWidgets/QMainWindow>
 #include "ui_ABETProcessor.h"
 
+
+
 struct data_item
 {
     QString firstname;
-    QString lastname; 
+    QString lastname;
+    QString studentID;
+    QString program;
     QString Score; 
     QString PerformanceIndicator; 
     QString CourseName; 
@@ -20,6 +24,7 @@ struct course_pi_aggregate_item
     double PercentSatisfactory;
     QString PerformanceIndicator;
     QString CourseName;
+    
 };
 
 class ABETProcessor : public QMainWindow
@@ -34,7 +39,7 @@ public:
     QVector<course_pi_aggregate_item> ExtractAggregatePI(QVector<data_item>& data);
     QStringList PIsforCourse(QString& CourseName, QVector<data_item>& data);
     bool WritePISummaryToCSV(const QString& fileName, const QVector<course_pi_aggregate_item>& coursepiaggdata);
-
+    enum class program { ce, environmental } Program = program::environmental;
 private:
     Ui::ABETProcessorClass ui;
 
