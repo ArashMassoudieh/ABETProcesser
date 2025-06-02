@@ -10,6 +10,7 @@
 #include "xlsxworkbook.h"
 #include "formcreatespreadsheets.h"
 #include "formCourseEvaluations.h"
+#include <QFileDialog>
 
 using namespace QXlsx;
 
@@ -25,49 +26,48 @@ ABETProcessor::ABETProcessor(QWidget *parent)
 
 void ABETProcessor::OnProcessPIFiles()
 {
-    QDir dir("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All");
-    dir.setFilter(QDir::Dirs);
-    QDirIterator directories(dir.absolutePath(), QDir::Dirs | QDir::NoSymLinks | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    QStringList all_dirs;
+	QString folderPath = selectFolder(this);
+    QDir dir(folderPath);
+    
     QVector<data_item> data;
-    while (directories.hasNext()) {
-        directories.next();
-        all_dirs << directories.filePath();
-        qDebug()<< directories.filePath();
-        QDir courseDir(directories.filePath());
-        QStringList nameFilter("*.xlsx");
-        QStringList xlsFilesAndDirectories = courseDir.entryList(nameFilter);
-        qDebug() << xlsFilesAndDirectories;
+    createSubfolder(folderPath, "saved");
+    
+    QStringList nameFilter("*.xlsx");
+    QStringList xlsFilesAndDirectories = dir.entryList(nameFilter);
+    qDebug() << xlsFilesAndDirectories;
 
-        for (int i = 0; i < xlsFilesAndDirectories.count(); i++)
+    for (int i = 0; i < xlsFilesAndDirectories.count(); i++)
+    {
+        QString fullfilename = dir.absolutePath() + "/" + xlsFilesAndDirectories[i];
+        qDebug() << fullfilename;
+        Document xlsxR(fullfilename);
+        qDebug() << folderPath + "/saved/" + xlsFilesAndDirectories[i];
+        xlsxR.saveAs(folderPath + "/saved/" + xlsFilesAndDirectories[i]);
+
+        QStringList sheetnames;
+        if (xlsxR.load()) // load excel file
         {
-            QString fullfilename = courseDir.absolutePath() + "/" + xlsFilesAndDirectories[i];
-            qDebug() << fullfilename;
-            Document xlsxR(fullfilename);
-            xlsxR.saveAs("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/saved/" + xlsFilesAndDirectories[i]);
+            qDebug() << "[debug] success to load xlsx file.";
+            sheetnames = xlsxR.sheetNames();
+        }
 
-            QStringList sheetnames;
-            if (xlsxR.load()) // load excel file
+        for (int j = 0; j < sheetnames.count(); j++)
+        {
+            qDebug() << sheetnames[j];
+            if (sheetnames[j].contains("."))
             {
-                qDebug() << "[debug] success to load xlsx file.";
-                sheetnames = xlsxR.sheetNames();
-            }
-
-            for (int j = 0; j < sheetnames.count(); j++)
-            {
-                qDebug() << sheetnames[j];
-                if (sheetnames[j].contains("."))
+                xlsxR.selectSheet(sheetnames[j]);
+                int row = 6;
+                while (xlsxR.cellAt(row, 1) && xlsxR.cellAt(row, 2))
                 {
-                    xlsxR.selectSheet(sheetnames[j]);
-                    int row = 6;
-                    while (xlsxR.cellAt(row, 1) && xlsxR.cellAt(row, 2))
+                    if (!xlsxR.cellAt(row, 1)->readValue().toString().isEmpty() && !xlsxR.cellAt(row, 2)->readValue().toString().isEmpty())
                     {
-                        if (!xlsxR.cellAt(row, 1)->readValue().toString().isEmpty() && !xlsxR.cellAt(row, 2)->readValue().toString().isEmpty())
+                        if ((xlsxR.cellAt(row, 3)->readValue().toString() == "BSARCH/BCE" || xlsxR.cellAt(row, 3)->readValue().toString() == "CE-BCE") && Program == program::ce)
                         {
-                            if ((xlsxR.cellAt(row, 3)->readValue().toString() == "BSARCH/BCE" || xlsxR.cellAt(row, 3)->readValue().toString() == "CE-BCE") && Program == program::ce)
+                            data_item Row;
+                            qDebug() << row;
+                            if (xlsxR.cellAt(row, 4))
                             {
-                                data_item Row;
-                                qDebug() << row;
                                 Row.lastname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[0];
                                 Row.firstname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[1];
                                 Row.studentID = xlsxR.cellAt(row, 2)->readValue().toString();
@@ -79,39 +79,44 @@ void ABETProcessor::OnProcessPIFiles()
                                 if (!Row.Score.trimmed().isEmpty())
                                     data.append(Row);
                             }
-                            else if (xlsxR.cellAt(row, 3)->readValue().toString() == "ENVEN-BS" && Program == program::environmental)
-                            {
-                                data_item Row;
-                                qDebug() << row;
-                                Row.lastname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[0];
-                                Row.firstname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[1];
-                                Row.studentID = xlsxR.cellAt(row, 2)->readValue().toString();
-                                Row.program = xlsxR.cellAt(row, 3)->readValue().toString();
-                                Row.Score = xlsxR.cellAt(row, 4)->readValue().toString().remove(",");
-                                Row.PerformanceIndicator = sheetnames[j];
-                                Row.CourseName = xlsFilesAndDirectories[i].split(".")[0].split("_")[0];
-                                //Row.Semester = xlsxR.cellAt(6, 7)->readValue().toString();
-                                if (!Row.Score.trimmed().isEmpty())
-                                    data.append(Row);
-                            }
-                            row++;
                         }
+                        else if (xlsxR.cellAt(row, 3)->readValue().toString() == "ENVEN-BS" && Program == program::environmental)
+                        {
+                            data_item Row;
+                            qDebug() << row;
+                            if (xlsxR.cellAt(row, 4))
+                            {
+                                Row.lastname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[0];
+                                Row.firstname = xlsxR.cellAt(row, 1)->readValue().toString().split(",")[1];
+                                Row.studentID = xlsxR.cellAt(row, 2)->readValue().toString();
+                                Row.program = xlsxR.cellAt(row, 3)->readValue().toString();
+                                Row.Score = xlsxR.cellAt(row, 4)->readValue().toString().remove(",");
+                                Row.PerformanceIndicator = sheetnames[j];
+                                Row.CourseName = xlsFilesAndDirectories[i].split(".")[0].split("_")[0];
+                                //Row.Semester = xlsxR.cellAt(6, 7)->readValue().toString();
+                                if (!Row.Score.trimmed().isEmpty())
+                                    data.append(Row);
+                            }
+                        }
+                        
                     }
+                    row++;
                 }
             }
-
         }
 
     }
+
+    
     if (Program == program::environmental)
-        WriteToCSV("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/AllData_ENV.csv", data);
+        WriteToCSV(folderPath + "/AllData_ENV.csv", data);
     else if (Program == program::ce)
-        WriteToCSV("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/AllData_CE.csv", data);
+        WriteToCSV(folderPath + "/AllData_CE.csv", data);
     QVector<course_pi_aggregate_item> aggregate_data = ExtractAggregatePI(data);
     if (Program == program::environmental)
-        WritePISummaryToCSV("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/Aggregate_data_ENV.csv", aggregate_data);
+        WritePISummaryToCSV( folderPath + "/Aggregate_data_ENV.csv", aggregate_data);
     else if (Program == program::ce)
-        WritePISummaryToCSV("G:/My Drive/ABET_Tables_for_PI_Raw_Data_Collection/23-24-All/Aggregate_data_CE.csv", aggregate_data);
+        WritePISummaryToCSV(folderPath +"/Aggregate_data_CE.csv", aggregate_data);
 }
 void ABETProcessor::OnCreatePITables()
 {
@@ -224,4 +229,43 @@ QVector<course_pi_aggregate_item>  ABETProcessor::ExtractAggregatePI(QVector<dat
 
     }
     return out;
+}
+
+
+QString selectFolder(QWidget* parent) {
+    QString folderPath = QFileDialog::getExistingDirectory(
+        parent,
+        "Select Folder",
+        QDir::homePath(),
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+    );
+
+    if (!folderPath.isEmpty()) {
+        qDebug() << "Selected folder:" << folderPath;
+    }
+    else {
+        qDebug() << "No folder selected.";
+    }
+
+    return folderPath;
+}
+
+bool createSubfolder(const QString& parentFolder, const QString& subfolderName) {
+    QDir dir(parentFolder);
+
+    // Ensure the parent folder exists
+    if (!dir.exists()) {
+        qDebug() << "Parent folder does not exist:" << parentFolder;
+        return false;
+    }
+
+    // Attempt to create the subfolder
+    if (dir.mkdir(subfolderName)) {
+        qDebug() << "Subfolder created:" << dir.filePath(subfolderName);
+        return true;
+    }
+    else {
+        qDebug() << "Failed to create subfolder or it already exists.";
+        return false;
+    }
 }

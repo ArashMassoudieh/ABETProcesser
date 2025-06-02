@@ -48,3 +48,7 @@ public slots:
     void OnCreatePITables();
     void OnCourseEvaluations();
 };
+
+
+QString selectFolder(QWidget* parent = nullptr);
+bool createSubfolder(const QString& parentFolder, const QString& subfolderName);

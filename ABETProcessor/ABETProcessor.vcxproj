@@ -31,12 +31,12 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.7</QtInstall>
+    <QtInstall>Qt 6.8</QtInstall>
     <QtModules>core;sql;gui;widgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>5.15</QtInstall>
+    <QtInstall>Qt 6.8</QtInstall>
     <QtModules>core;sql;sql;gui;widgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
@@ -60,20 +60,20 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Projects\ABETProcesser\ABETProcess;C:\Projects\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Projects\ABETProcesser\ABETProcess;C:\Projects\QXlsxfromSassan\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Projects\QXlsx\bin\Qt6</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Projects\QXlsxfromSassan\QXlsx\bin\Qt6</AdditionalLibraryDirectories>
       <AdditionalDependencies>QXlsxQt6.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalLibraryDirectories>C:\Projects\QXlsx\bin\Qt6</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Projects\QXlsxfromSassan\QXlsx\bin\Qt6</AdditionalLibraryDirectories>
       <AdditionalDependencies>QXlsxQt6d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Projects\ABETProcesser\ABETProcess;C:\Projects\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);$(Qt_INCLUDEPATH_)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Projects\ABETProcesser\ABETProcess;C:\Projects\QXlsxfromSassan\QXlsx\QXlsx\header;%(AdditionalIncludeDirectories);$(Qt_INCLUDEPATH_)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
