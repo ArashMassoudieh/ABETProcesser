@@ -4,6 +4,7 @@
 #include <QMap>
 #include <studentcoursedata.h>
 #include <QDir>
+#include <QSqlDatabase>
 
 struct PI{
     QString ID;
@@ -22,6 +23,7 @@ public:
     QStringList CourseList;
 
     bool ReadFromExcel(QString filename, bool allcourses);
+    bool savePIDataToDB(QSqlDatabase& db);
     void savePIMapToCSV(const QString& filePath);
     QStringList GetPIsForCourse(const QString &coursename);
     bool CreateExcelFiles(StudentCourseData *studentData,const QDir &OutputLocation);

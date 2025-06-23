@@ -20,6 +20,11 @@ public:
     ~formCourseEvaluations();
     PIData pi_data;
     CourseEvaluationData course_eval_data;
+    bool createPIAverageScoreTable(QSqlDatabase& db);
+
+    bool createSOAggregatesTable(QSqlDatabase& db);
+
+    bool createCourseAverageTable(QSqlDatabase& db);
 
 private:
     Ui::formCourseEvaluations* ui;
@@ -29,6 +34,7 @@ private:
 public slots:
     void OnOkPressed();
     void OnChooseFolder();
+    
 };
 
 #endif // FORMCOURSEEVALUATIONS_H

@@ -86,24 +86,72 @@ bool CourseEvaluationData::ReadFromExcel(QString filename)
 
 bool CourseEvaluationData::AppendtoSqlit(QSqlDatabase* db)
 {
-    qDebug() << db->databaseName();
-    if (!db->open())
-    {
-        qDebug() << "Could not open the database";
+    if (!db || !db->isOpen()) {
+        qDebug() << "Database not open!";
+        return false;
     }
+
     QSqlQuery query(*db);
-    bool res = true; 
-    for (int i = 0; i < size(); i++)
-    {
-        QString qrystatement = "INSERT INTO CourseEvals ( subject, catalog, section, coursenumber, instructor, year_semester, evaluated, enrolled, score ) "
-            "VALUES ('" + at(i).Subject + "','" + at(i).Catalog + "','" + at(i).Section + "','" + at(i).CourseNumber + "','" + at(i).Instructor + "','" + at(i).Year_Semester + "'," + QString::number(at(i).Evaluated) + "," + QString::number(at(i).Enrolled) + "," + QString::number(at(i).score) + ")";
-        res &= query.prepare(qrystatement);
-        if (res) query.exec(qrystatement);
-        if (!res)
-        {
-            qDebug() << query.lastError(); 
+    db->transaction();
+
+    // 1. Drop and recreate the table
+    if (!query.exec("DROP TABLE IF EXISTS CourseEvals")) {
+        qDebug() << "Failed to drop table:" << query.lastError().text();
+        db->rollback();
+        return false;
+    }
+
+    if (!query.exec(R"(
+        CREATE TABLE CourseEvals (
+            subject TEXT,
+            catalog TEXT,
+            section TEXT,
+            coursenumber TEXT,
+            instructor TEXT,
+            year_semester TEXT,
+            evaluated INTEGER,
+            enrolled INTEGER,
+            score REAL
+        )
+    )")) {
+        qDebug() << "Failed to create table:" << query.lastError().text();
+        db->rollback();
+        return false;
+    }
+
+    // 2. Prepare insert statement
+    query.prepare(R"(
+        INSERT INTO CourseEvals (
+            subject, catalog, section, coursenumber, instructor,
+            year_semester, evaluated, enrolled, score
+        ) VALUES (
+            :subject, :catalog, :section, :coursenumber, :instructor,
+            :year_semester, :evaluated, :enrolled, :score
+        )
+    )");
+
+    // 3. Insert records
+    bool res = true;
+    for (int i = 0; i < size(); ++i) {
+        const auto& item = at(i);
+        query.bindValue(":subject", item.Subject);
+        query.bindValue(":catalog", item.Catalog);
+        query.bindValue(":section", item.Section);
+        query.bindValue(":coursenumber", item.CourseNumber);
+        query.bindValue(":instructor", item.Instructor);
+        query.bindValue(":year_semester", item.Year_Semester);
+        query.bindValue(":evaluated", item.Evaluated);
+        query.bindValue(":enrolled", item.Enrolled);
+        query.bindValue(":score", item.score);
+
+        if (!query.exec()) {
+            qDebug() << "Failed to insert row:" << query.lastError().text();
+            res = false;
+            db->rollback();
+            return false;
         }
     }
-    db->close();
-    return res; 
+
+    db->commit();
+    return res;
 }

@@ -6,6 +6,10 @@
 #include "xlsxrichstring.h"
 #include "xlsxworkbook.h"
 #include <QDebug>
+#include <qsqldatabase.h>
+#include <qsqlquery.h>
+#include <qsqlerror.h>
+ 
 
 using namespace QXlsx;
 
@@ -175,4 +179,62 @@ bool PIData::CreateExcelFile(StudentCourseData *studentData,const QString &cours
         xlsxW.saveAs(OutputFile.split(".")[0] + "_" + section + "." + OutputFile.split(".")[1]);
     }
     return true;
+}
+
+bool PIData::savePIDataToDB(QSqlDatabase& db)
+{
+    if (!db.isOpen()) {
+        qWarning() << "Database is not open!";
+        return false;
+    }
+
+    QSqlQuery query(db);
+
+    db.transaction();
+
+    // 1. Create table if it doesn't exist
+    const QString createTableSQL = R"(
+        CREATE TABLE IF NOT EXISTS PI_Course_Map (
+            Course TEXT,
+            Description TEXT,
+            PI TEXT
+        )
+    )";
+
+    if (!query.exec(createTableSQL)) {
+        qWarning() << "Failed to create table PI_Course_Map:" << query.lastError().text();
+        db.rollback();
+        return false;
+    }
+
+    // 2. Clear existing content
+    if (!query.exec("DELETE FROM PI_Course_Map")) {
+        qWarning() << "Failed to clear PI_Course_Map:" << query.lastError().text();
+        db.rollback();
+        return false;
+    }
+
+    // 3. Insert data
+    QSqlQuery insertQuery(db);
+    for (auto it = constBegin(); it != constEnd(); ++it) {
+        const PI& pi = it.value();
+
+        for (const QString& course : pi.CoursesApplied) {
+            insertQuery.prepare(R"(
+                INSERT INTO PI_Course_Map (Course, Description, PI)
+                VALUES (:course, :description, :pi)
+            )");
+            insertQuery.bindValue(":course", course);
+            insertQuery.bindValue(":description", pi.Description);
+            insertQuery.bindValue(":pi", pi.ID);
+
+            if (!insertQuery.exec()) {
+                qWarning() << "Failed to insert row for PI:" << pi.ID << insertQuery.lastError().text();
+                db.rollback();
+                return false;
+            }
+        }
+    }
+
+    return db.commit();
 }
