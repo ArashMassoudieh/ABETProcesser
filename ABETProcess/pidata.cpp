@@ -26,7 +26,7 @@ PIData& PIData::operator==(const PIData &RHS)
     return *this;
 }
 
-bool PIData::ReadFromExcel(QString filename)
+bool PIData::ReadFromExcel(QString filename, bool allcourses)
 {
     Document xlsxR(filename);
     QStringList sheetnames;
@@ -69,7 +69,7 @@ bool PIData::ReadFromExcel(QString filename)
                     {   qDebug()<<xlsxR.cellAt(row, col)->readValue().toString();
                         if (!xlsxR.cellAt(row, col)->readValue().toString().isEmpty())
                         {
-                            if (xlsxR.cellAt(row, col)->readValue().toString().contains("*"))
+                            if (xlsxR.cellAt(row, col)->readValue().toString().contains("*") || allcourses)
                                 item.CoursesApplied.append(xlsxR.cellAt(1, col)->readValue().toString());
                         }
                     }
@@ -79,6 +79,25 @@ bool PIData::ReadFromExcel(QString filename)
         row++;
     }
     return true;
+}
+
+void PIData::savePIMapToCSV(const QString& filePath) {
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qWarning("Unable to open file for writing.");
+        return;
+    }
+
+    QTextStream out(&file);
+    out << "Course,ID\n";  // Header
+
+    for (const auto& pi : *this) {
+        for (const QString& course : pi.CoursesApplied) {
+            out << "\"" << course << "\",\"" << pi.ID << "\"\n";
+        }
+    }
+
+    file.close();
 }
 
 QStringList PIData::GetPIsForCourse(const QString &coursename)

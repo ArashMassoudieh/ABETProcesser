@@ -37,7 +37,10 @@ void formCreateSpreadSheets::OnOkPressed()
                                                  | QFileDialog::DontResolveSymlinks);
 
     QDir dir(dirString);
-    pi_data.ReadFromExcel(PIExcelFileName);
+    pi_data.ReadFromExcel(PIExcelFileName, false);
+    PIData pi_data_for_course_eval;
+    pi_data_for_course_eval.ReadFromExcel(PIExcelFileName, true);
+	pi_data_for_course_eval.savePIMapToCSV("PI_Course_Table.csv");
     student_course_data.ReadFromExcel(StudentsExcelFileName);
     pi_data.CreateExcelFiles(&student_course_data,dir);
 }

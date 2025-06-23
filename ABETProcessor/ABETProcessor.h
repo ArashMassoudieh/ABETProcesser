@@ -39,7 +39,7 @@ public:
     QVector<course_pi_aggregate_item> ExtractAggregatePI(QVector<data_item>& data);
     QStringList PIsforCourse(QString& CourseName, QVector<data_item>& data);
     bool WritePISummaryToCSV(const QString& fileName, const QVector<course_pi_aggregate_item>& coursepiaggdata);
-    enum class program { ce, environmental } Program = program::ce;
+    enum class program { ce, environmental } Program = program::environmental;
 private:
     Ui::ABETProcessorClass ui;
 

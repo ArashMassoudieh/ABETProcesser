@@ -44,7 +44,7 @@ void formCourseEvaluations::OnOkPressed()
 {
     QString PIExcelFileName = PITable_pb->text();
     QString EvaluationsFolder = CourseEvaluationFolder->text();
-    pi_data.ReadFromExcel(PIExcelFileName);
+    pi_data.ReadFromExcel(PIExcelFileName, true);
     course_eval_data.ReadFromDirectory(CourseEvaluationFolder->text());
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");//not dbConnection
     db.setDatabaseName(CourseEvaluationFolder->text() + "/" + "AY_Evals.db");

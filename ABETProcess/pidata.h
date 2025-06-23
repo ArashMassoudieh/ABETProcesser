@@ -21,7 +21,8 @@ public:
     PIData& operator==(const PIData &RHS);
     QStringList CourseList;
 
-    bool ReadFromExcel(QString filename);
+    bool ReadFromExcel(QString filename, bool allcourses);
+    void savePIMapToCSV(const QString& filePath);
     QStringList GetPIsForCourse(const QString &coursename);
     bool CreateExcelFiles(StudentCourseData *studentData,const QDir &OutputLocation);
     bool CreateExcelFile(StudentCourseData *studentData,const QString &course, const QString &OutputFile);
