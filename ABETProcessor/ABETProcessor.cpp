@@ -151,10 +151,10 @@ bool ABETProcessor::WritePISummaryToCSV(const QString& fileName, const QVector<c
     QFile file(fileName);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
-    out << "SO,CourseName,PerformanceIndicator,Percent Satisfactory\n";
+    out << "SO,CourseName,PerformanceIndicator,Percent Satisfactory, Number evaluated\n";
 
     for (int i = 0; i < coursepiaggdata.size(); i++)
-        out << "SO " + coursepiaggdata[i].SO << "," << coursepiaggdata[i].CourseName << "," << coursepiaggdata[i].PerformanceIndicator << "," << coursepiaggdata[i].PercentSatisfactory * 100 << "\n";
+        out << "SO " + coursepiaggdata[i].SO << "," << coursepiaggdata[i].CourseName << "," << coursepiaggdata[i].PerformanceIndicator << "," << coursepiaggdata[i].PercentSatisfactory * 100 << "," << coursepiaggdata[i].number_evaluated << "\n";
     file.close();
 
     return true;
@@ -223,6 +223,7 @@ QVector<course_pi_aggregate_item>  ABETProcessor::ExtractAggregatePI(QVector<dat
             PI_item.PerformanceIndicator = PIs[picounter];
             PI_item.SO = PIs[picounter].split(".")[0];
             PI_item.PercentSatisfactory = countsatisfied / counttotal;
+            PI_item.number_evaluated = counttotal;
             out.append(PI_item);
 
         }

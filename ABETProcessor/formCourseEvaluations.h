@@ -21,10 +21,10 @@ public:
     PIData pi_data;
     CourseEvaluationData course_eval_data;
     bool createPIAverageScoreTable(QSqlDatabase& db);
-
     bool createSOAggregatesTable(QSqlDatabase& db);
-
     bool createCourseAverageTable(QSqlDatabase& db);
+    bool createCourseAverageTableOnlyInPI(QSqlDatabase& db);
+    enum class program { ce, environmental } Program = program::environmental;
 
 private:
     Ui::formCourseEvaluations* ui;

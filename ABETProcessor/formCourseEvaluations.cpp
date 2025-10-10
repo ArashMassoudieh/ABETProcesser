@@ -49,10 +49,18 @@ void formCourseEvaluations::OnOkPressed()
     
     course_eval_data.ReadFromDirectory(CourseEvaluationFolder->text());
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");//not dbConnection
-    db.setDatabaseName(CourseEvaluationFolder->text() + "/" + "AY_Evals.db");
+    
+    QString FileName;
+    if (Program == program::ce)
+        FileName = CourseEvaluationFolder->text() + "/" + "AY_Evals_CE.db";
+	else if (Program == program::environmental)
+        FileName = CourseEvaluationFolder->text() + "/" + "AY_Evals_ENV.db";
+    
+    db.setDatabaseName(FileName);
+    
     qDebug() << db.databaseName();
     
-    if (!QFileInfo::exists(CourseEvaluationFolder->text() + "/" + "AY_Evals.db")) {
+    if (!QFileInfo::exists(FileName)) {
         db.open();
         QSqlQuery query;
         query.exec("create table CourseEvals "
@@ -92,6 +100,7 @@ void formCourseEvaluations::OnOkPressed()
     pi_data.savePIDataToDB(db);
     course_eval_data.AppendtoSqlit(&db);
     createCourseAverageTable(db);
+    createCourseAverageTableOnlyInPI(db);
     createPIAverageScoreTable(db);
 	createSOAggregatesTable(db);
     db.close(); 
@@ -219,7 +228,8 @@ bool formCourseEvaluations::createCourseAverageTable(QSqlDatabase& db)
     if (!query.exec(R"(
         CREATE TABLE Course_Avg_Scores (
             coursenumber TEXT,
-            AvgScore REAL
+            AvgScore REAL,
+            MinScore REAL
         )
     )")) {
         qWarning() << "Failed to create Course_Avg_Scores:" << query.lastError().text();
@@ -229,12 +239,58 @@ bool formCourseEvaluations::createCourseAverageTable(QSqlDatabase& db)
 
     // 3. Populate the table with aggregated data
     if (!query.exec(R"(
-        INSERT INTO Course_Avg_Scores (coursenumber, AvgScore)
-        SELECT coursenumber, AVG(score)
+        INSERT INTO Course_Avg_Scores (coursenumber, AvgScore, MinScore)
+        SELECT coursenumber, AVG(score), MIN(score)
         FROM CourseEvals
         GROUP BY coursenumber
     )")) {
         qWarning() << "Failed to populate Course_Avg_Scores:" << query.lastError().text();
+        db.rollback();
+        return false;
+    }
+
+    return db.commit();
+}
+
+bool formCourseEvaluations::createCourseAverageTableOnlyInPI(QSqlDatabase& db)
+{
+    if (!db.isOpen()) {
+        qWarning() << "Database not open!";
+        return false;
+    }
+
+    QSqlQuery query(db);
+    db.transaction();
+
+    // 1. Drop the table if it exists
+    if (!query.exec("DROP TABLE IF EXISTS Course_Avg_Scores_for_PIs")) {
+        qWarning() << "Failed to drop Course_Avg_Scores_for_PIs:" << query.lastError().text();
+        db.rollback();
+        return false;
+    }
+
+    // 2. Create new table
+    if (!query.exec(R"(
+        CREATE TABLE Course_Avg_Scores_for_PIs (
+            coursenumber TEXT,
+            AvgScore REAL,
+            MinScore REAL
+        )
+    )")) {
+        qWarning() << "Failed to create Course_Avg_Scores:" << query.lastError().text();
+        db.rollback();
+        return false;
+    }
+
+    // 3. Populate the table with aggregated data
+    if (!query.exec(R"(
+        INSERT INTO Course_Avg_Scores_for_PIs (coursenumber, AvgScore, MinScore)
+        SELECT CourseEvals.coursenumber, AVG(CourseEvals.score), MIN(CourseEvals.score)
+        FROM CourseEvals
+        INNER JOIN PI_Course_Map ON CourseEvals.coursenumber = PI_Course_Map.Course
+        GROUP BY CourseEvals.coursenumber
+    )")) {
+        qWarning() << "Failed to populate Course_Avg_Scores_for_PIs:" << query.lastError().text();
         db.rollback();
         return false;
     }

@@ -24,6 +24,7 @@ struct course_pi_aggregate_item
     double PercentSatisfactory;
     QString PerformanceIndicator;
     QString CourseName;
+    int number_evaluated; 
     
 };
 
