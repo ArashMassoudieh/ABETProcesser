@@ -28,6 +28,25 @@ struct course_pi_aggregate_item
     
 };
 
+struct pi_aggregate_item {
+    QString SO;
+    QString PerformanceIndicator;
+    double WeightedAvgPercentSatisfactory;  // Changed from Mean
+    double MinPercentSatisfactory;
+    int NumberOfCourses;
+    int TotalStudentsEvaluated;  // Add this field
+    QStringList CoursesList;
+};
+
+struct so_aggregate_item {
+    QString SO;
+    double MeanPercentSatisfactory;
+    double MinPercentSatisfactory;
+    int NumberOfPIs;
+    int TotalStudentsEvaluated;
+    QStringList PIsList;
+};
+
 class ABETProcessor : public QMainWindow
 {
     Q_OBJECT
@@ -40,7 +59,12 @@ public:
     QVector<course_pi_aggregate_item> ExtractAggregatePI(QVector<data_item>& data);
     QStringList PIsforCourse(QString& CourseName, QVector<data_item>& data);
     bool WritePISummaryToCSV(const QString& fileName, const QVector<course_pi_aggregate_item>& coursepiaggdata);
-    enum class program { ce, environmental } Program = program::environmental;
+    enum class program { ce, environmental } Program = program::ce;
+    QVector<pi_aggregate_item> ExtractPILevelAggregate(const QVector<course_pi_aggregate_item>& coursepiaggdata);
+    bool WritePIAggregateToExcel(const QString& fileName, const QVector<pi_aggregate_item>& piaggdata);
+    QVector<so_aggregate_item> ExtractSOLevelAggregate(const QVector<pi_aggregate_item>& piaggdata);
+    bool WriteSOAggregateToExcel(const QString& fileName, const QVector<so_aggregate_item>& soaggdata);
+    bool WriteCoursePIAggregateToExcel(const QString& fileName, const QVector<course_pi_aggregate_item>& coursepiaggdata);
 private:
     Ui::ABETProcessorClass ui;
 

@@ -394,12 +394,12 @@ bool ABETProcessor::WritePIAggregateToExcel(const QString& fileName, const QVect
 
             // Write SO header row
             xlsx.mergeCells(CellRange(currentRow, 1, currentRow, 7), soHeaderFormat);
-            xlsx.write(currentRow, 1, "SO" + currentSO, soHeaderFormat);
+            xlsx.write(currentRow, 1, "Student Outcome " + currentSO, soHeaderFormat);
             currentRow++;
 
             // Write column headers for this section
-            xlsx.write(currentRow, 1, "SO", headerFormat);
-            xlsx.write(currentRow, 2, "PI", headerFormat);
+            xlsx.write(currentRow, 1, "Student Outcome", headerFormat);
+            xlsx.write(currentRow, 2, "Performance Indicator", headerFormat);
             xlsx.write(currentRow, 3, "Weighted Avg % Satisfactory", headerFormat);
             xlsx.write(currentRow, 4, "Min % Satisfactory", headerFormat);
             xlsx.write(currentRow, 5, "Number of Courses", headerFormat);
@@ -574,12 +574,12 @@ bool ABETProcessor::WriteSOAggregateToExcel(const QString& fileName, const QVect
     currentRow += 2; // Skip a row
 
     // Write column headers
-    xlsx.write(currentRow, 1, "SO", headerFormat);
+    xlsx.write(currentRow, 1, "Student Outcome", headerFormat);
     xlsx.write(currentRow, 2, "Mean % Satisfactory", headerFormat);
     xlsx.write(currentRow, 3, "Min % Satisfactory", headerFormat);
     xlsx.write(currentRow, 4, "Number of PIs", headerFormat);
     xlsx.write(currentRow, 5, "Total Students", headerFormat);
-    xlsx.write(currentRow, 6, "PIs", headerFormat);
+    xlsx.write(currentRow, 6, "Performance Indicators", headerFormat);
     currentRow++;
 
     // Write data rows
@@ -698,9 +698,9 @@ bool ABETProcessor::WriteCoursePIAggregateToExcel(const QString& fileName, const
             currentRow++;
 
             // Write column headers for this section
-            xlsx.write(currentRow, 1, "SO", headerFormat);
+            xlsx.write(currentRow, 1, "Student Outcome", headerFormat);
             xlsx.write(currentRow, 2, "Course Name", headerFormat);
-            xlsx.write(currentRow, 3, "PI", headerFormat);
+            xlsx.write(currentRow, 3, "Performance Indicator", headerFormat);
             xlsx.write(currentRow, 4, "% Satisfactory", headerFormat);
             xlsx.write(currentRow, 5, "Number Evaluated", headerFormat);
             currentRow++;
